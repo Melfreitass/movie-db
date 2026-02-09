@@ -13,8 +13,15 @@ export const findAll = async (filters = {}) => {
     if (available !== undefined) {
         where.available = available === "true"
     }
-    if (minRating) {
-        where.minRating >= 8
+    if (minRating !== undefined) {
+        where.rating = {
+            gte: Number(minRating),
+        };
+    }
+    if (maxDuration !== undefined) {
+        where.duration = {
+            lte: Number(maxDuration),
+        }
     }
 
     return await prisma.movie.findMany({
