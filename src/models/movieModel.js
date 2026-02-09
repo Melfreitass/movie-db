@@ -31,7 +31,7 @@ export const findAll = async (filters = {}) => {
 };
 
 export const findById = async (id) => {
-    return await prisma.exemplo.findUnique({
+    return await prisma.movie.findUnique({
         where: { id: parseInt(id) },
     });
 };

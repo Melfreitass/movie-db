@@ -19,6 +19,7 @@ export const getAll = async (req, res) => {
 
         const movies = await movieModel.findAll(filters);
 
+        //valida genero
         if (genre) {
             const genreBusca = genre.toLowerCase().trim();
 
@@ -98,17 +99,29 @@ export const getById = async (req, res) => {
         const { id } = req.params;
 
         if (isNaN(id)) {
-            return res.status(400).json({ error: 'O ID enviado não é um número válido.' });
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                error: 'O ID enviado não é um número válido.'
+            });
         }
 
-        const data = await model.findById(id);
+        const data = await movieModel.findById(id);
         if (!data) {
-            return res.status(404).json({ error: 'Registro não encontrado.' });
+            return res.status(404).json({
+                status: 404,
+                sucess: false,
+                message: 'Nenhum filme encontrado.',
+            });
         }
         res.json({ data });
     } catch (error) {
         console.error('Erro ao buscar:', error);
-        res.status(500).json({ error: 'Erro ao buscar registro' });
+        res.status(500).json({
+            error: 'Erro ao buscar filmes',
+            details: error.message,
+            status: 500,
+        });
     }
 };
 
