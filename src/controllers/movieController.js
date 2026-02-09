@@ -74,13 +74,19 @@ export const create = async (req, res) => {
 
         const { title, description, duration, genre, rating, available } = req.body;
 
-        if (!title || title.trim().length < 3) return res.status(400).json({
+        if (!title || title.trim().length < 3)
+            return res.status(400).json({
             error: 'O título (title) é obrigatório e deve ter no mínimo 3 caracteres!'
         });
-        if (!description || description.trim().length < 10) return res.status(400).json({
+        if (!description || description.trim().length < 10)
+            return res.status(400).json({
             error: 'A descrição (description) é obrigatória e deve conter no mínimo 10 caracteres!'
         });
 
+        if (duration = !undefined || duration < 0 || !Number.isInteger(duration))
+            return res.status(400).json({
+            error: 'A duracao deve ser um número inteiro positivo',
+            });
 
         const data = await model.create({
             title,
