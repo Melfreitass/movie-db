@@ -1,0 +1,43 @@
+import prisma from '../utils/prismaClient.js';
+
+export const create = async (data) => {
+    return await prisma.exemplo.create({ data });
+};
+
+export const findAll = async (filters = {}) => {
+    const {title, genre, available, minRating, maxDuration} = filters;
+    const where = {};
+
+    if (title) where.title = { contains: title, mode: 'insensitive' };
+    if (genre) where.genre = { contains: genre, mode: 'insensitive' };
+    if (available !== undefined) {
+        where.available = available === "true"
+    }
+    if (minRating) {
+        where.minRating >= 8
+    }
+
+    return await prisma.movie.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+    });
+};
+
+export const findById = async (id) => {
+    return await prisma.exemplo.findUnique({
+        where: { id: parseInt(id) },
+    });
+};
+
+export const update = async (id, data) => {
+    return await prisma.exemplo.update({
+        where: { id: parseInt(id) },
+        data,
+    });
+};
+
+export const remove = async (id) => {
+    return await prisma.exemplo.delete({
+        where: { id: parseInt(id) },
+    });
+};
