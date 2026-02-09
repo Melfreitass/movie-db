@@ -1,7 +1,7 @@
 import prisma from '../utils/prismaClient.js';
 
 export const create = async (data) => {
-    return await prisma.exemplo.create({ data });
+    return await prisma.movie.create({ data });
 };
 
 export const findAll = async (filters = {}) => {

@@ -71,11 +71,15 @@ export const create = async (req, res) => {
             });
         }
 
-        const { nome, descricao, ano, preco } = req.body;
+        const { title, description, duration, genre, rating, available } = req.body;
 
-        if (!nome) return res.status(400).json({ error: 'O nome (nome) é obrigatório!' });
-        if (!ano) return res.status(400).json({ error: 'O ano (ano) é obrigatório!' });
-        if (!preco) return res.status(400).json({ error: 'O preço (preco) é obrigatório!' });
+        if (!title || title.trim().length < 3) return res.status(400).json({
+            error: 'O título (title) é obrigatório e deve ter no mínimo 3 caracteres!'
+        });
+        if (!description || description.trim().length < 10) return res.status(400).json({
+            error: 'A descrição (description) é obrigatória e deve conter no mínimo 3 caracteres!'
+        });
+
 
         const data = await model.create({
             nome,
