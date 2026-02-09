@@ -1,3 +1,4 @@
+import { Decimal } from '@prisma/client/runtime/client';
 import * as movieModel from '../models/movieModel.js';
 
 const genreValid = [
@@ -77,15 +78,17 @@ export const create = async (req, res) => {
             error: 'O título (title) é obrigatório e deve ter no mínimo 3 caracteres!'
         });
         if (!description || description.trim().length < 10) return res.status(400).json({
-            error: 'A descrição (description) é obrigatória e deve conter no mínimo 3 caracteres!'
+            error: 'A descrição (description) é obrigatória e deve conter no mínimo 10 caracteres!'
         });
 
 
         const data = await model.create({
-            nome,
-            descricao,
-            ano: parseInt(ano),
-            preco: parseFloat(preco),
+            title,
+            description,
+            genre,
+            rating: Decimal(rating),
+            duration: parseInt(duration),
+            available,
         });
 
         res.status(201).json({
