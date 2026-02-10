@@ -1,6 +1,7 @@
 import { Decimal } from '@prisma/client/runtime/client';
 import * as movieModel from '../models/movieModel.js';
 import { Prisma } from '@prisma/client';
+import prisma from '../utils/prismaClient.js';
 
 const genreValid = [
     'ação',
@@ -81,7 +82,7 @@ export const create = async (req, res) => {
             error: 'O título (title) é obrigatório e deve ter no mínimo 3 caracteres!'
         });
 
-        const movieExists  = await movieModel.findFirst({
+        const movieExists  = await prisma.movie.findFirst({
             where: { title }
         })
         if (movieExists) 
@@ -128,11 +129,8 @@ export const create = async (req, res) => {
             genre: genreNormalizado,
             rating: new Prisma.Decimal(ratingNumber),
             duration,
-            available,
+            available: true, //RN available
         });
-
-        //RN available
-        
 
         res.status(201).json({
             message: 'Registro cadastrado com sucesso!',
