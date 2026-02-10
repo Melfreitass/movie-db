@@ -1,15 +1,16 @@
 import { Decimal } from '@prisma/client/runtime/client';
 import * as movieModel from '../models/movieModel.js';
+import { Prisma } from '@prisma/client';
 
 const genreValid = [
-    'Ação',
-    'Drama',
-    'Comédia',
-    'Terror',
-    'Romance',
-    'Animação',
-    'Ficção Científica',
-    'Suspense',
+    'ação',
+    'drama',
+    'comédia',
+    'terror',
+    'romance',
+    'animação',
+    'ficção Científica',
+    'suspense',
 ];
 
 export const getAll = async (req, res) => {
@@ -74,28 +75,64 @@ export const create = async (req, res) => {
 
         const { title, description, duration, genre, rating, available } = req.body;
 
+        //RN title
         if (!title || title.trim().length < 3)
             return res.status(400).json({
             error: 'O título (title) é obrigatório e deve ter no mínimo 3 caracteres!'
         });
+
+        const movieExists  = await movieModel.findFirst({
+            where: { title }
+        })
+        if (movieExists) 
+            return res.status(409).json({
+            status: 409,
+            error: 'Não é permitido cadastrar filmes com título duplicado'
+        });
+
+        //RN description
         if (!description || description.trim().length < 10)
             return res.status(400).json({
             error: 'A descrição (description) é obrigatória e deve conter no mínimo 10 caracteres!'
         });
 
-        if (duration = !undefined || duration < 0 || !Number.isInteger(duration))
+        //RN duration
+        if (duration === undefined || duration < 0 || !Number.isInteger(duration))
             return res.status(400).json({
-            error: 'A duracao deve ser um número inteiro positivo',
+            error: 'A duracao (duration) é obrigatória e deve ser um número inteiro positivo',
+            });
+        if (duration > 300)
+            return res.status(400).json({
+            error: 'Filmes com duração (duration) superior a 300 minutos não podem ser cadastrados',
+        })
+
+        //RN genre
+        const genreNormalizado = genre.trim().toLocaleLowerCase()
+        if (!genreValid.includes(genreNormalizado))
+            return res.status(400).json({
+            error: 'Gênero (genre) inválido',
+            suggestion: 'Cadastre com um dos gêneros (genre) válidos',
+            genreValid,
             });
 
-        const data = await model.create({
+        //RN rating
+        const ratingNumber = Number(rating)
+        if (rating === undefined || isNaN(ratingNumber) || ratingNumber < 0 || ratingNumber > 10) 
+            return res.status(400).json({
+            error: 'A nota (rating) deve estar entre 0 e 10',
+            });
+
+        const data = await movieModel.create({
             title,
             description,
-            genre,
-            rating: Decimal(rating),
-            duration: parseInt(duration),
+            genre: genreNormalizado,
+            rating: new Prisma.Decimal(ratingNumber),
+            duration,
             available,
         });
+
+        //RN available
+        
 
         res.status(201).json({
             message: 'Registro cadastrado com sucesso!',
@@ -103,7 +140,11 @@ export const create = async (req, res) => {
         });
     } catch (error) {
         console.error('Erro ao criar:', error);
-        res.status(500).json({ error: 'Erro interno no servidor ao salvar o registro.' });
+        res.status(500).json({ 
+            error: 'Erro interno no servidor ao salvar o registro.',
+            details: error.message,
+            status: 500,
+         });
     }
 };
 
