@@ -180,6 +180,7 @@ export const getById = async (req, res) => {
 export const update = async (req, res) => {
     try {
         const { id } = req.params;
+        const { title, description, duration, genre, rating, available } = req.body;
 
         if (!req.body || Object.keys(req.body).length === 0) {
             return res.status(400).json({
@@ -189,14 +190,76 @@ export const update = async (req, res) => {
 
         if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
 
-        const exists = await model.findById(id);
+        const exists = await movieModel.findById(id);
         if (!exists) {
             return res.status(404).json({ error: 'Registro não encontrado para atualizar.' });
         }
 
-        const data = await model.update(id, req.body);
+        //RN title
+        if (title.trim().length < 3)
+            return res.status(400).json({
+            error: 'O título deve ter no mínimo 3 caracteres!'
+        });
+
+        const movieExists  = await prisma.movie.findFirst({
+            where: { title }
+        })
+        if (movieExists) 
+            return res.status(409).json({
+            status: 409,
+            error: 'Não é permitido atualizar filmes com título duplicado'
+        });
+
+        //RN description
+        if (description.trim().length < 10)
+            return res.status(400).json({
+            error: 'A descrição (description) deve conter no mínimo 10 caracteres!'
+        });
+
+        //RN duration
+        if (duration < 0 || !Number.isInteger(duration))
+            return res.status(400).json({
+            error: 'A duracao deve ser um número inteiro positivo',
+            });
+        if (duration > 300)
+            return res.status(400).json({
+            error: 'Filmes com duração (duration) superior a 300 minutos não podem ser atualizados',
+        })
+
+        //RN genre
+        const genreNormalizado = genre.trim().toLocaleLowerCase()
+        if (!genreValid.includes(genreNormalizado))
+            return res.status(400).json({
+            error: 'Gênero (genre) inválido',
+            suggestion: 'Cadastre com um dos gêneros (genre) válidos',
+            genreValid,
+            });
+
+        //RN rating
+        const ratingNumber = Number(rating)
+        if (isNaN(ratingNumber) || ratingNumber < 0 || ratingNumber > 10) 
+            return res.status(400).json({
+            error: 'A nota (rating) deve estar entre 0 e 10',
+            });
+
+        //RN available
+        if (exists.available === false)
+            return res.status(400).json({
+        error: 'Filmes com available = false não podem ser atualizados'
+    })
+
+        const updatedData = {
+            title: title ?? exists.title,
+            description: description ?? exists.description,
+            duration: duration ?? exists.duration,
+            genre: genre ?? exists.genre,
+            rating: rating ?? exists.rating,
+            available: available ?? exists.available,
+        };
+
+        const data = await movieModel.update(id, updatedData);
         res.json({
-            message: `O registro "${data.nome}" foi atualizado com sucesso!`,
+            message: `O registro "${data.title}" foi atualizado com sucesso!`,
             data,
         });
     } catch (error) {
