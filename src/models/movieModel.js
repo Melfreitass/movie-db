@@ -37,7 +37,7 @@ export const findById = async (id) => {
 };
 
 export const update = async (id, data) => {
-    return await prisma.exemplo.update({
+    return await prisma.movie.update({
         where: { id: parseInt(id) },
         data,
     });

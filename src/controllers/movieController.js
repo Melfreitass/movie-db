@@ -220,7 +220,7 @@ export const update = async (req, res) => {
       if (movieExists)
         return res.status(409).json({
           status: 409,
-          error: "Não é permitido cadastrar filmes com título duplicado",
+          error: "Não é permitido atualizar filmes com título duplicado",
         });
     }
 
@@ -253,7 +253,7 @@ export const update = async (req, res) => {
       if (!genreValid.includes(genreNormalizado))
         return res.status(400).json({
           error: "Gênero (genre) inválido",
-          suggestion: "Atualiza com um dos gêneros (genre) válidos",
+          suggestion: "Atualize com um dos gêneros (genre) válidos",
           genreValid,
         });
     }
