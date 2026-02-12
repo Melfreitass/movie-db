@@ -44,7 +44,7 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-    return await prisma.exemplo.delete({
+    return await prisma.movie.delete({
         where: { id: parseInt(id) },
     });
 };

@@ -79,33 +79,34 @@ export const create = async (req, res) => {
     //RN title
     if (!title || title.trim().length < 3)
       return res.status(400).json({
-        error:
-          "O título (title) é obrigatório e deve ter no mínimo 3 caracteres!",
+        status: 400,
+        error: "O título (title) é obrigatório e deve ter no mínimo 3 caracteres!",
       });
 
     //RN description
     if (!description || description.trim().length < 10)
       return res.status(400).json({
-        error:
-          "A descrição (description) é obrigatória e deve conter no mínimo 10 caracteres!",
+        status: 400,
+        error: "A descrição (description) é obrigatória e deve conter no mínimo 10 caracteres!",
       });
 
     //RN duration
     if (duration === undefined || duration < 0 || !Number.isInteger(duration))
       return res.status(400).json({
-        error:
-          "A duracao (duration) é obrigatória e deve ser um número inteiro positivo",
+        status: 400,
+        error: "A duracao (duration) é obrigatória e deve ser um número inteiro positivo",
       });
     if (duration > 300)
       return res.status(400).json({
-        error:
-          "Filmes com duração (duration) superior a 300 minutos não podem ser cadastrados",
+        status: 400,
+        error: "Filmes com duração (duration) superior a 300 minutos não podem ser cadastrados",
       });
 
     //RN genre
     const genreNormalizado = genre.trim().toLocaleLowerCase();
     if (!genreValid.includes(genreNormalizado))
       return res.status(400).json({
+        status: 400,
         error: "Gênero (genre) inválido",
         suggestion: "Cadastre com um dos gêneros (genre) válidos",
         genreValid,
@@ -120,6 +121,7 @@ export const create = async (req, res) => {
       ratingNumber > 10
     )
       return res.status(400).json({
+        status: 400,
         error: "A nota (rating) deve estar entre 0 e 10",
       });
 
@@ -133,6 +135,7 @@ export const create = async (req, res) => {
     });
 
     res.status(201).json({
+      status: 201,
       message: "Registro cadastrado com sucesso!",
       data,
     });
@@ -188,19 +191,26 @@ export const update = async (req, res) => {
       });
     }
 
-    if (isNaN(id)) return res.status(400).json({ error: "ID inválido." });
+    if (isNaN(id)) return res.status(400).json({ 
+      status: 400,
+      error: "ID inválido." 
+    });
 
     const exists = await movieModel.findById(id);
 
     if (!exists) {
       return res
         .status(404)
-        .json({ error: "Registro não encontrado para atualizar." });
+        .json({ 
+          status: 404,
+          error: "Registro não encontrado para atualizar." 
+        });
     }
 
     //RN available
     if (exists.available === false)
       return res.status(400).json({
+        status: 400,
         error: "Filmes com available = false não podem ser atualizados",
       });
 
@@ -208,6 +218,7 @@ export const update = async (req, res) => {
     if (title !== undefined) {
       if (title.trim().length < 3)
         return res.status(400).json({
+          status: 400,
           error: "O título deve ter no mínimo 3 caracteres!",
         });
 
@@ -228,6 +239,7 @@ export const update = async (req, res) => {
     if (description !== undefined) {
       if (description.trim().length < 10)
         return res.status(400).json({
+          status: 400,
           error:
             "A descrição (description) deve conter no mínimo 10 caracteres!",
         });
@@ -237,12 +249,13 @@ export const update = async (req, res) => {
     if (duration !== undefined) {
       if (duration < 0 || !Number.isInteger(duration))
         return res.status(400).json({
+          status: 400,
           error: "A duracao deve ser um número inteiro positivo",
         });
       if (duration > 300)
         return res.status(400).json({
-          error:
-            "Filmes com duração (duration) superior a 300 minutos não podem ser atualizados",
+            status: 400,
+            error: "Filmes com duração (duration) superior a 300 minutos não podem ser atualizados",
         });
     }
 
@@ -252,6 +265,7 @@ export const update = async (req, res) => {
       genreNormalizado = genre.trim().toLocaleLowerCase();
       if (!genreValid.includes(genreNormalizado))
         return res.status(400).json({
+          status: 400,
           error: "Gênero (genre) inválido",
           suggestion: "Atualize com um dos gêneros (genre) válidos",
           genreValid,
@@ -263,6 +277,7 @@ export const update = async (req, res) => {
       const ratingNumber = Number(rating);
       if (isNaN(ratingNumber) || ratingNumber < 0 || ratingNumber > 10)
         return res.status(400).json({
+          status: 400,
           error: "A nota (rating) deve estar entre 0 e 10",
         });
     }
@@ -296,16 +311,19 @@ export const remove = async (req, res) => {
 
     if (isNaN(id)) return res.status(400).json({ error: "ID inválido." });
 
-    const exists = await model.findById(id);
+    const exists = await movieModel.findById(id);
     if (!exists) {
       return res
         .status(404)
-        .json({ error: "Registro não encontrado para deletar." });
+        .json({ 
+          status: 404,
+          error: "Registro não encontrado para deletar." 
+        });
     }
 
-    await model.remove(id);
+    await movieModel.remove(id);
     res.json({
-      message: `O registro "${exists.nome}" foi deletado com sucesso!`,
+      message: `O registro "${exists.title}" foi deletado com sucesso!`,
       deletado: exists,
     });
   } catch (error) {
