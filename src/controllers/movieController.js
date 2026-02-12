@@ -83,6 +83,17 @@ export const create = async (req, res) => {
         error: "O título (title) é obrigatório e deve ter no mínimo 3 caracteres!",
       });
 
+      const movieExists = await prisma.movie.findFirst({
+        where: { 
+            title,
+        },
+      });
+      if (movieExists)
+        return res.status(409).json({
+          status: 409,
+          error: "Não é permitido cadastrar filmes com título duplicado",
+        });
+
     //RN description
     if (!description || description.trim().length < 10)
       return res.status(400).json({
@@ -318,6 +329,13 @@ export const remove = async (req, res) => {
         .json({ 
           status: 404,
           error: "Registro não encontrado para deletar." 
+        });
+    }
+
+    if (Number(exists.rating) >= 9) {
+      return res.status(400).json({
+          status: 400,
+          error: "Filmes com nota (rating) ≥ 9 não podem ser deletados",
         });
     }
 
