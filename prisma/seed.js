@@ -28,7 +28,7 @@ async function main() {
                 duration: 175,
                 genre: 'Drama',
                 rating: 10.00,
-                available: true,
+                available: false,
             },
             {
                 title: 'As Branquelas',
